@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GreenPrint — Calculator</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/calculator.css" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body class="calc-page">
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <circle cx="14" cy="14" r="13" stroke="var(--green)" stroke-width="1.5"/>
+            <path d="M8 18c2-4 4-6 6-6s4 2 6-2" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M14 8v4M14 8l-2 2M14 8l2 2" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        GreenPrint
+      </a>
+      <div class="nav-progress-label" id="stepLabel">Step 1 of 4</div>
+    </div>
+  </nav>
+
+  <!-- Quick Mode Modal -->
+  <div id="quickModeModal" class="quick-modal" style="display:none">
+    <div class="quick-modal-card">
+      <button class="quick-modal-close" onclick="closeQuickMode()">✕</button>
+      <div class="quick-modal-header">
+        <span class="step-badge">⚡ Quick Mode</span>
+        <h2>Pick your lifestyle</h2>
+        <p>Get an instant estimate in under 30 seconds. You can always do the full calculator for precision.</p>
+      </div>
+      <div class="quick-archetypes" id="quickArchetypes">
+        <button class="archetype-card" data-archetype="student">
+          <span class="arch-icon">🎒</span>
+          <span class="arch-name">Student</span>
+          <span class="arch-desc">Low income, transit or cycling, shared housing, minimal flights</span>
+          <span class="arch-estimate">~4–6t CO₂e/yr</span>
+        </button>
+        <button class="archetype-card" data-archetype="urban_professional">
+          <span class="arch-icon">💼</span>
+          <span class="arch-name">Urban Professional</span>
+          <span class="arch-desc">Apartment, transit or car, a few flights/year, mixed diet</span>
+          <span class="arch-estimate">~7–10t CO₂e/yr</span>
+        </button>
+        <button class="archetype-card" data-archetype="suburban_family">
+          <span class="arch-icon">🏡</span>
+          <span class="arch-name">Suburban Family</span>
+          <span class="arch-desc">House, one or two gas cars, 2–4 flights, standard diet</span>
+          <span class="arch-estimate">~12–18t CO₂e/yr</span>
+        </button>
+        <button class="archetype-card" data-archetype="eco_conscious">
+          <span class="arch-icon">🌿</span>
+          <span class="arch-name">Eco-Conscious</span>
+          <span class="arch-desc">Plant-based diet, EV or transit, minimal flights, green home</span>
+          <span class="arch-estimate">~3–5t CO₂e/yr</span>
+        </button>
+        <button class="archetype-card" data-archetype="high_footprint">
+          <span class="arch-icon">🚀</span>
+          <span class="arch-name">High Flyer</span>
+          <span class="arch-desc">Large home, SUV, frequent flyer, meat-heavy diet</span>
+          <span class="arch-estimate">~18–25t CO₂e/yr</span>
+        </button>
+        <button class="archetype-card" data-archetype="rural">
+          <span class="arch-icon">🌾</span>
+          <span class="arch-name">Rural / Small Town</span>
+          <span class="arch-desc">House, gas car is essential, local food, few flights</span>
+          <span class="arch-estimate">~10–14t CO₂e/yr</span>
+        </button>
+      </div>
+      <div class="quick-location-row">
+        <input type="text" class="form-input" id="quickLocation" placeholder="Your city or postal code (for local resources)" />
+      </div>
+      <button class="btn-primary" style="width:100%;justify-content:center;margin-top:16px" onclick="submitQuickMode()">
+        See My Results →
+      </button>
+    </div>
+  </div>
+
+  <!-- Quick Mode trigger banner -->
+  <div class="quick-mode-banner">
+    <span>Short on time?</span>
+    <button class="quick-mode-trigger" onclick="openQuickMode()">⚡ Try Quick Mode — 30 seconds</button>
+  </div>
+
+  <div class="calc-layout">
+    <!-- Progress sidebar -->
+    <aside class="calc-sidebar">
+      <div class="progress-steps">
+        <div class="prog-step active" data-step="1">
+          <div class="prog-dot"></div>
+          <div class="prog-info">
+            <span class="prog-num">01</span>
+            <span class="prog-name">About You</span>
+          </div>
+        </div>
+        <div class="prog-line"></div>
+        <div class="prog-step" data-step="2">
+          <div class="prog-dot"></div>
+          <div class="prog-info">
+            <span class="prog-num">02</span>
+            <span class="prog-name">Food & Diet</span>
+          </div>
+        </div>
+        <div class="prog-line"></div>
+        <div class="prog-step" data-step="3">
+          <div class="prog-dot"></div>
+          <div class="prog-info">
+            <span class="prog-num">03</span>
+            <span class="prog-name">Transport</span>
+          </div>
+        </div>
+        <div class="prog-line"></div>
+        <div class="prog-step" data-step="4">
+          <div class="prog-dot"></div>
+          <div class="prog-info">
+            <span class="prog-num">04</span>
+            <span class="prog-name">Home Energy</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main form area -->
+    <main class="calc-main">
+      <div class="calc-progress-bar">
+        <div class="calc-progress-fill" id="progressFill" style="width: 25%"></div>
+      </div>
+
+      <!-- Step 1: About You -->
+      <div class="calc-step active" id="step1">
+        <div class="step-header">
+          <span class="step-badge">01 / 04</span>
+          <h1 class="step-title">Let's start with the basics</h1>
+          <p class="step-desc">This helps us put your footprint in context.</p>
+        </div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label class="form-label">What country do you live in?</label>
+            <div class="select-wrap">
+              <select class="form-select" id="country">
+                <option value="CA">Canada</option>
+                <option value="US">United States</option>
+                <option value="UK">United Kingdom</option>
+                <option value="AU">Australia</option>
+                <option value="DE">Germany</option>
+                <option value="FR">France</option>
+                <option value="OTHER">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group full">
+            <label class="form-label">How many people are in your household?</label>
+            <div class="number-buttons" id="householdSize">
+              <button class="num-btn active" data-value="1">1</button>
+              <button class="num-btn" data-value="2">2</button>
+              <button class="num-btn" data-value="3">3</button>
+              <button class="num-btn" data-value="4">4</button>
+              <button class="num-btn" data-value="5">5+</button>
+            </div>
+          </div>
+
+          <div class="form-group full">
+            <label class="form-label">Your location (city or postal code)</label>
+            <input type="text" class="form-input" id="location" placeholder="e.g. Cambridge, ON or N1R 5T7" />
+            <span class="form-hint">Used to find local resources near you</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Food -->
+      <div class="calc-step" id="step2">
+        <div class="step-header">
+          <span class="step-badge">02 / 04</span>
+          <h1 class="step-title">Food & diet</h1>
+          <p class="step-desc">What you eat is often the single biggest part of your footprint.</p>
+        </div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label class="form-label">How would you describe your diet?</label>
+            <div class="card-options" id="dietType">
+              <button class="card-opt" data-value="vegan">
+                <span class="opt-icon">🌱</span>
+                <span class="opt-label">Vegan</span>
+                <span class="opt-sub">Plant-based only</span>
+              </button>
+              <button class="card-opt" data-value="vegetarian">
+                <span class="opt-icon">🥗</span>
+                <span class="opt-label">Vegetarian</span>
+                <span class="opt-sub">No meat or fish</span>
+              </button>
+              <button class="card-opt" data-value="pescatarian">
+                <span class="opt-icon">🐟</span>
+                <span class="opt-label">Pescatarian</span>
+                <span class="opt-sub">Fish but no meat</span>
+              </button>
+              <button class="card-opt" data-value="omnivore_low">
+                <span class="opt-icon">🍗</span>
+                <span class="opt-label">Some meat</span>
+                <span class="opt-sub">A few times/week</span>
+              </button>
+              <button class="card-opt active" data-value="omnivore_high">
+                <span class="opt-icon">🥩</span>
+                <span class="opt-label">Regular meat</span>
+                <span class="opt-sub">Most days</span>
+              </button>
+              <button class="card-opt" data-value="beef_heavy">
+                <span class="opt-icon">🍖</span>
+                <span class="opt-label">Beef-heavy</span>
+                <span class="opt-sub">Red meat often</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">How often do you buy local/seasonal produce?</label>
+            <div class="slider-wrap">
+              <input type="range" class="form-range" id="localFood" min="0" max="100" value="30" step="10" />
+              <div class="range-labels">
+                <span>Rarely</span>
+                <span id="localFoodVal" class="range-val">30%</span>
+                <span>Always</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">How much food do you waste per week?</label>
+            <div class="card-options sm" id="foodWaste">
+              <button class="card-opt" data-value="low">
+                <span class="opt-icon">♻️</span>
+                <span class="opt-label">Very little</span>
+              </button>
+              <button class="card-opt active" data-value="medium">
+                <span class="opt-icon">🗑️</span>
+                <span class="opt-label">Some</span>
+              </button>
+              <button class="card-opt" data-value="high">
+                <span class="opt-icon">🪣</span>
+                <span class="opt-label">A lot</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Transport -->
+      <div class="calc-step" id="step3">
+        <div class="step-header">
+          <span class="step-badge">03 / 04</span>
+          <h1 class="step-title">Getting around</h1>
+          <p class="step-desc">Transport is typically the second-largest source of personal emissions.</p>
+        </div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label class="form-label">What's your primary way of getting around?</label>
+            <div class="card-options" id="primaryTransport">
+              <button class="card-opt" data-value="walk_cycle">
+                <span class="opt-icon">🚲</span>
+                <span class="opt-label">Walk / Cycle</span>
+                <span class="opt-sub">Most trips</span>
+              </button>
+              <button class="card-opt" data-value="public_transit">
+                <span class="opt-icon">🚌</span>
+                <span class="opt-label">Public Transit</span>
+                <span class="opt-sub">Bus, train, metro</span>
+              </button>
+              <button class="card-opt" data-value="electric_car">
+                <span class="opt-icon">⚡</span>
+                <span class="opt-label">Electric Car</span>
+                <span class="opt-sub">EV or hybrid</span>
+              </button>
+              <button class="card-opt active" data-value="gas_car_small">
+                <span class="opt-icon">🚗</span>
+                <span class="opt-label">Gas Car</span>
+                <span class="opt-sub">Sedan / small car</span>
+              </button>
+              <button class="card-opt" data-value="gas_car_large">
+                <span class="opt-icon">🚙</span>
+                <span class="opt-label">SUV / Truck</span>
+                <span class="opt-sub">Large vehicle</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group" id="carDistanceGroup">
+            <label class="form-label">Average km driven per week</label>
+            <div class="slider-wrap">
+              <input type="range" class="form-range" id="carDistance" min="0" max="1000" value="200" step="20" />
+              <div class="range-labels">
+                <span>0 km</span>
+                <span id="carDistanceVal" class="range-val">200 km</span>
+                <span>1000 km</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Flights per year (return trips)</label>
+            <div class="slider-wrap">
+              <input type="range" class="form-range" id="flights" min="0" max="20" value="2" step="1" />
+              <div class="range-labels">
+                <span>None</span>
+                <span id="flightsVal" class="range-val">2 flights</span>
+                <span>20+</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Flight type (most common)</label>
+            <div class="card-options sm" id="flightType">
+              <button class="card-opt" data-value="none">
+                <span class="opt-icon">🚫</span>
+                <span class="opt-label">No flying</span>
+              </button>
+              <button class="card-opt active" data-value="short">
+                <span class="opt-icon">✈️</span>
+                <span class="opt-label">Short haul</span>
+              </button>
+              <button class="card-opt" data-value="long">
+                <span class="opt-icon">🌍</span>
+                <span class="opt-label">Long haul</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Home Energy -->
+      <div class="calc-step" id="step4">
+        <div class="step-header">
+          <span class="step-badge">04 / 04</span>
+          <h1 class="step-title">Home & energy</h1>
+          <p class="step-desc">Heating, cooling, and electricity use at home.</p>
+        </div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label class="form-label">What type of home do you live in?</label>
+            <div class="card-options" id="homeType">
+              <button class="card-opt" data-value="apartment_small">
+                <span class="opt-icon">🏢</span>
+                <span class="opt-label">Small Apt</span>
+                <span class="opt-sub">Studio / 1BR</span>
+              </button>
+              <button class="card-opt active" data-value="apartment_large">
+                <span class="opt-icon">🏬</span>
+                <span class="opt-label">Large Apt</span>
+                <span class="opt-sub">2BR+</span>
+              </button>
+              <button class="card-opt" data-value="house_small">
+                <span class="opt-icon">🏠</span>
+                <span class="opt-label">Small House</span>
+                <span class="opt-sub">Under 150m²</span>
+              </button>
+              <button class="card-opt" data-value="house_large">
+                <span class="opt-icon">🏡</span>
+                <span class="opt-label">Large House</span>
+                <span class="opt-sub">150m²+</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Primary heating source</label>
+            <div class="card-options sm" id="heatingType">
+              <button class="card-opt" data-value="electric_renewable">
+                <span class="opt-icon">☀️</span>
+                <span class="opt-label">Electric/Renewable</span>
+              </button>
+              <button class="card-opt active" data-value="natural_gas">
+                <span class="opt-icon">🔥</span>
+                <span class="opt-label">Natural Gas</span>
+              </button>
+              <button class="card-opt" data-value="oil">
+                <span class="opt-icon">🛢️</span>
+                <span class="opt-label">Oil / Propane</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Monthly electricity bill (approx.)</label>
+            <div class="slider-wrap">
+              <input type="range" class="form-range" id="electricBill" min="20" max="400" value="100" step="10" />
+              <div class="range-labels">
+                <span>$20</span>
+                <span id="electricBillVal" class="range-val">$100</span>
+                <span>$400+</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group full">
+            <label class="form-label">Do you have any of these?</label>
+            <div class="checkbox-group" id="greenHome">
+              <label class="check-option">
+                <input type="checkbox" value="solar" />
+                <span class="check-box"></span>
+                <span class="check-icon">☀️</span>
+                Solar panels
+              </label>
+              <label class="check-option">
+                <input type="checkbox" value="heatpump" />
+                <span class="check-box"></span>
+                <span class="check-icon">🌡️</span>
+                Heat pump
+              </label>
+              <label class="check-option">
+                <input type="checkbox" value="insulation" />
+                <span class="check-box"></span>
+                <span class="check-icon">🧱</span>
+                Good insulation
+              </label>
+              <label class="check-option">
+                <input type="checkbox" value="none" />
+                <span class="check-box"></span>
+                <span class="check-icon">❌</span>
+                None of these
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation buttons -->
+      <div class="calc-nav">
+        <button class="btn-ghost" id="backBtn" style="display:none" onclick="prevStep()">← Back</button>
+        <button class="btn-primary" id="nextBtn" onclick="nextStep()">Next →</button>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="js/calculator.js"></script>
+</body>
+</html>

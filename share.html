@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GreenPrint — My Carbon Footprint</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    body { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; background: var(--bg); }
+
+    .share-page-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .share-page-header h1 {
+      font-family: var(--font-display);
+      font-size: 28px;
+      letter-spacing: -1px;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .share-page-header p { font-size: 15px; color: var(--text-muted); }
+
+    /* THE CARD */
+    .share-card {
+      width: 520px;
+      max-width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 44px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(74,222,128,0.08);
+    }
+
+    .card-glow {
+      position: absolute;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: var(--green);
+      filter: blur(120px);
+      opacity: 0.06;
+      top: -80px; right: -80px;
+      pointer-events: none;
+    }
+
+    .card-top-line {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--green), transparent);
+    }
+
+    .card-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-display);
+      font-size: 16px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+
+    .card-logo svg { flex-shrink: 0; }
+
+    .card-score-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
+
+    .card-score-left { flex: 1; }
+
+    .card-score-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-faint);
+      margin-bottom: 8px;
+    }
+
+    .card-score-num {
+      font-family: var(--font-display);
+      font-size: 64px;
+      letter-spacing: -3px;
+      line-height: 1;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .card-score-unit {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .card-grade-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 20px;
+      text-align: center;
+    }
+
+    .card-grade-label { font-size: 10px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+    .card-grade-val { font-family: var(--font-display); font-size: 26px; }
+
+    .card-bars { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+
+    .card-bar-row { display: grid; grid-template-columns: 80px 1fr 52px; align-items: center; gap: 10px; }
+    .card-bar-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+    .card-bar-track { height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
+    .card-bar-fill { height: 100%; border-radius: 4px; }
+    .card-bar-val { font-size: 12px; font-weight: 600; color: var(--text-muted); text-align: right; }
+
+    .card-divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+    .card-context-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-context-item { text-align: center; }
+    .card-context-val { font-family: var(--font-display); font-size: 18px; color: var(--text); display: block; margin-bottom: 2px; }
+    .card-context-label { font-size: 11px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+
+    .card-footer {
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-footer-cta { font-size: 12px; color: var(--text-faint); }
+    .card-footer-url { font-size: 12px; color: var(--green); font-weight: 600; }
+
+    /* ACTION BUTTONS */
+    .share-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .share-back {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .share-back a { font-size: 14px; color: var(--text-faint); text-decoration: underline; }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .share-page-header, .share-actions, .share-back, .nav { display: none !important; }
+      .share-card {
+        width: 100%;
+        border: none;
+        box-shadow: none;
+        background: white;
+        color: black;
+        border-radius: 0;
+        padding: 32px;
+      }
+      :root {
+        --bg-card: white;
+        --bg-elevated: #f5f5f5;
+        --border: #e0e0e0;
+        --text: #111;
+        --text-muted: #555;
+        --text-faint: #999;
+        --green: #16a34a;
+        --amber: #d97706;
+        --teal: #0d9488;
+      }
+      .card-glow { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="share-page-header">
+    <h1>My GreenPrint Results</h1>
+    <p>Save, share, or print your carbon footprint summary.</p>
+  </div>
+
+  <div class="share-card" id="shareCard">
+    <div class="card-glow"></div>
+    <div class="card-top-line"></div>
+
+    <div class="card-logo">
+      <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="13" stroke="var(--green)" stroke-width="1.5"/>
+        <path d="M8 18c2-4 4-6 6-6s4 2 6-2" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M14 8v4M14 8l-2 2M14 8l2 2" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      GreenPrint
+    </div>
+
+    <div class="card-score-row">
+      <div class="card-score-left">
+        <div class="card-score-label">Annual carbon footprint</div>
+        <div class="card-score-num" id="cardScore">—</div>
+        <div class="card-score-unit">tonnes CO₂e / year</div>
+      </div>
+      <div class="card-grade-badge">
+        <span class="card-grade-label">Rating</span>
+        <span class="card-grade-val" id="cardGrade">—</span>
+      </div>
+    </div>
+
+    <div class="card-bars" id="cardBars">
+      <!-- populated by JS -->
+    </div>
+
+    <div class="card-divider"></div>
+
+    <div class="card-context-row">
+      <div class="card-context-item">
+        <span class="card-context-val" id="cardVsAvg">—</span>
+        <span class="card-context-label">vs. national avg</span>
+      </div>
+      <div class="card-context-item">
+        <span class="card-context-val" id="cardCountryAvg">—t</span>
+        <span class="card-context-label">Country average</span>
+      </div>
+      <div class="card-context-item">
+        <span class="card-context-val" style="color:var(--teal)">2.5t</span>
+        <span class="card-context-label">2030 target</span>
+      </div>
+    </div>
+
+    <div class="card-footer">
+      <span class="card-footer-cta">Calculate yours at</span>
+      <span class="card-footer-url">GreenPrint · FutureForge 2025</span>
+    </div>
+  </div>
+
+  <div class="share-actions">
+    <button class="btn-primary" onclick="printCard()">🖨️ Save as PDF</button>
+    <button class="btn-ghost" onclick="copyCardText()">📋 Copy summary</button>
+    <a href="results.html" class="btn-ghost">← Back to results</a>
+  </div>
+
+  <script>
+    const GRADE_COLORS = {
+      'Excellent': '#4ade80', 'Good': '#86efac', 'Average': '#fbbf24',
+      'High': '#fb923c', 'Very High': '#f87171'
+    };
+
+    const BAR_COLORS = { food: '#4ade80', transport: '#fbbf24', home: '#2dd4bf' };
+    const BAR_ICONS = { food: '🍽️', transport: '🚗', home: '🏠' };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const raw = sessionStorage.getItem('greenprint_result');
+      if (!raw) { window.location.href = 'calculator.html'; return; }
+
+      const data = JSON.parse(raw);
+      const { total, scores, grade, gradeColor, vsAverage, countryAvg } = data;
+
+      document.getElementById('cardScore').textContent = total;
+      const gradeEl = document.getElementById('cardGrade');
+      gradeEl.textContent = grade;
+      gradeEl.style.color = GRADE_COLORS[grade] || gradeColor || 'var(--green)';
+
+      const vsEl = document.getElementById('cardVsAvg');
+      vsEl.textContent = vsAverage || '—';
+      vsEl.style.color = (vsAverage || '').includes('below') ? 'var(--green)' : 'var(--amber)';
+
+      document.getElementById('cardCountryAvg').textContent = `${countryAvg || 15.4}t`;
+
+      const maxBar = 20;
+      const bars = document.getElementById('cardBars');
+      bars.innerHTML = Object.entries(scores).map(([key, val]) => `
+        <div class="card-bar-row">
+          <span class="card-bar-label">${BAR_ICONS[key]} ${key.charAt(0).toUpperCase() + key.slice(1)}</span>
+          <div class="card-bar-track">
+            <div class="card-bar-fill" style="width:${Math.min((val/maxBar)*100,100)}%;background:${BAR_COLORS[key]}"></div>
+          </div>
+          <span class="card-bar-val">${val}t</span>
+        </div>
+      `).join('');
+    });
+
+    function printCard() {
+      window.print();
+    }
+
+    function copyCardText() {
+      const raw = sessionStorage.getItem('greenprint_result');
+      if (!raw) return;
+      const { total, scores, grade, vsAverage } = JSON.parse(raw);
+      const text = `My carbon footprint: ${total}t CO₂e/year (${grade})\n\n🍽️ Food: ${scores.food}t\n🚗 Transport: ${scores.transport}t\n🏠 Home: ${scores.home}t\n\n${vsAverage} · 2030 global target: 2.5t\n\nCalculated with GreenPrint — FutureForge 2025`;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        const orig = btn.textContent;
+        btn.textContent = '✅ Copied!';
+        setTimeout(() => btn.textContent = orig, 2000);
+      });
+    }
+  </script>
+</body>
+</html>

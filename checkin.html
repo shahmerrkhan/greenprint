@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GreenPrint — Check In</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    body { padding-top: 64px; min-height: 100vh; }
+
+    .checkin-layout {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 60px 24px;
+    }
+
+    .checkin-hero {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .checkin-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--green-dim);
+      border: 1px solid var(--border);
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .checkin-title {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 5vw, 44px);
+      letter-spacing: -1.5px;
+      color: var(--text);
+      margin-bottom: 14px;
+      line-height: 1.1;
+    }
+
+    .checkin-subtitle { font-size: 16px; color: var(--text-muted); line-height: 1.6; }
+
+    /* PROGRESS RING */
+    .days-ring {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin: 32px 0;
+    }
+
+    .days-ring-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+
+    /* COMMITMENT CARD */
+    .commitment-recall {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .recall-icon { font-size: 32px; flex-shrink: 0; }
+    .recall-label { font-size: 13px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; margin-bottom: 6px; }
+    .recall-action { font-size: 16px; font-weight: 600; color: var(--text); }
+
+    /* CHECK-IN QUESTION */
+    .checkin-question {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+
+    .question-text {
+      font-family: var(--font-display);
+      font-size: 22px;
+      letter-spacing: -0.8px;
+      color: var(--text);
+      margin-bottom: 24px;
+      line-height: 1.3;
+    }
+
+    .checkin-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .checkin-opt {
+      background: var(--bg-elevated);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 18px 16px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .checkin-opt .opt-emoji { font-size: 28px; }
+
+    .checkin-opt:hover { border-color: var(--border-hover); color: var(--text); }
+    .checkin-opt.yes { border-color: var(--green); background: var(--green-dim); color: var(--green); }
+    .checkin-opt.partial { border-color: var(--amber); background: rgba(251,191,36,0.1); color: var(--amber); }
+    .checkin-opt.no { border-color: var(--red); background: rgba(248,113,113,0.08); color: var(--red); }
+
+    /* RESULT PANEL */
+    .checkin-result {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 36px;
+      text-align: center;
+      display: none;
+    }
+
+    .result-emoji { font-size: 52px; margin-bottom: 16px; display: block; }
+
+    .result-title {
+      font-family: var(--font-display);
+      font-size: 28px;
+      letter-spacing: -1px;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .result-sub { font-size: 15px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
+
+    .saved-stat {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      background: var(--green-dim);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px 28px;
+      margin-bottom: 28px;
+    }
+
+    .saved-num { font-family: var(--font-display); font-size: 36px; color: var(--green); letter-spacing: -1px; }
+    .saved-label { font-size: 12px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* BADGES */
+    .badges-earned {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .badges-earned-label { font-size: 12px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; margin-bottom: 14px; }
+
+    .badge-display {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .badge-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .badge-pill.unlocked {
+      background: var(--green-dim);
+      border-color: rgba(74,222,128,0.3);
+      color: var(--green);
+    }
+
+    .result-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
+
+    /* NO DATA */
+    .no-data {
+      text-align: center;
+      padding: 80px 24px;
+    }
+
+    .no-data h2 { font-family: var(--font-display); font-size: 26px; margin-bottom: 12px; }
+    .no-data p { color: var(--text-muted); margin-bottom: 24px; }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="14" r="13" stroke="var(--green)" stroke-width="1.5"/>
+          <path d="M8 18c2-4 4-6 6-6s4 2 6-2" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M14 8v4M14 8l-2 2M14 8l2 2" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        GreenPrint
+      </a>
+      <a href="results.html" class="nav-cta">← My Results</a>
+    </div>
+  </nav>
+
+  <div class="checkin-layout" id="noDataView" style="display:none">
+    <div class="no-data">
+      <span style="font-size:48px;display:block;margin-bottom:20px">📋</span>
+      <h2>No commitment found</h2>
+      <p>Go back and make a commitment on your results page first, then come back in a week to check in.</p>
+      <a href="results.html" class="btn-primary">Go to My Results →</a>
+    </div>
+  </div>
+
+  <div class="checkin-layout" id="mainView" style="display:none">
+    <div class="checkin-hero">
+      <div class="checkin-badge">🔥 7-Day Check-In</div>
+      <h1 class="checkin-title">How did it go?</h1>
+      <p class="checkin-subtitle">A week ago you made a commitment. Let's see how it went and how much CO₂ you may have saved.</p>
+
+      <div class="days-ring">
+        <svg viewBox="0 0 100 100" width="90" height="90">
+          <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(74,222,128,0.1)" stroke-width="8"/>
+          <circle cx="50" cy="50" r="40" fill="none" stroke="var(--green)" stroke-width="8"
+            stroke-dasharray="251" stroke-dashoffset="0"
+            stroke-linecap="round" transform="rotate(-90 50 50)"/>
+          <text x="50" y="54" text-anchor="middle" font-family="DM Serif Display,serif" font-size="22" fill="#f0faf2" id="dayCountText">7</text>
+        </svg>
+        <span class="days-ring-label" id="dayCountLabel">days since your commitment</span>
+      </div>
+    </div>
+
+    <div class="commitment-recall" id="commitmentRecall">
+      <span class="recall-icon" id="recallIcon">🌱</span>
+      <div>
+        <div class="recall-label">Your commitment was</div>
+        <div class="recall-action" id="recallAction">—</div>
+      </div>
+    </div>
+
+    <div class="checkin-question" id="questionPanel">
+      <div class="question-text">Did you follow through on your commitment?</div>
+      <div class="checkin-options">
+        <button class="checkin-opt yes" onclick="submitCheckin('yes')">
+          <span class="opt-emoji">✅</span>
+          Yes, I did it!
+        </button>
+        <button class="checkin-opt partial" onclick="submitCheckin('partial')">
+          <span class="opt-emoji">🌗</span>
+          Partially — I tried
+        </button>
+        <button class="checkin-opt no" onclick="submitCheckin('no')">
+          <span class="opt-emoji">😔</span>
+          Not this time
+        </button>
+        <button class="checkin-opt" style="border-color:var(--teal);color:var(--teal);background:rgba(45,212,191,0.08)" onclick="submitCheckin('exceeded')">
+          <span class="opt-emoji">🚀</span>
+          Did even more!
+        </button>
+      </div>
+    </div>
+
+    <div class="checkin-result" id="resultPanel">
+      <span class="result-emoji" id="resultEmoji"></span>
+      <div class="result-title" id="resultTitle"></div>
+      <div class="result-sub" id="resultSub"></div>
+
+      <div class="saved-stat" id="savedStat" style="display:none">
+        <span class="saved-num" id="savedNum"></span>
+        <span class="saved-label">kg CO₂ saved this week</span>
+      </div>
+
+      <div class="badges-earned" id="badgesEarned" style="display:none">
+        <div class="badges-earned-label">Badges earned</div>
+        <div class="badge-display" id="badgeDisplay"></div>
+      </div>
+
+      <div class="result-actions">
+        <a href="results.html" class="btn-primary">See my full results →</a>
+        <a href="calculator.html" class="btn-ghost">Recalculate my footprint</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const COMMIT_ICONS = {
+      meatfree: '🥦', transit: '🚌', foodbank: '🍎',
+      waste: '♻️', thermostat: '🌡️', localfood: '🛒'
+    };
+
+    const COMMIT_SAVINGS = {
+      meatfree: 3.2, transit: 2.1, foodbank: 1.5,
+      waste: 0.8, thermostat: 1.5, localfood: 0.9
+    };
+
+    const RESULT_DATA = {
+      yes: {
+        emoji: '🎉',
+        title: 'You actually did it.',
+        sub: 'That\'s not nothing. Most people say they\'ll change and don\'t. You did. Here\'s your estimated CO₂ saved from this one action.',
+        multiplier: 1.0
+      },
+      exceeded: {
+        emoji: '🚀',
+        title: 'You went above and beyond.',
+        sub: 'You didn\'t just follow through — you pushed further. That\'s how real change happens. Your estimated savings this week:',
+        multiplier: 1.5
+      },
+      partial: {
+        emoji: '🌱',
+        title: 'Partial credit still counts.',
+        sub: 'Trying matters. Even partial action has real impact, and building the habit is more than half the battle. Keep going.',
+        multiplier: 0.5
+      },
+      no: {
+        emoji: '💪',
+        title: 'Okay. Tomorrow is a new start.',
+        sub: 'The fact that you came back to check in shows you care. Pick a smaller commitment next time — something so easy it\'s hard to skip.',
+        multiplier: 0
+      }
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem('gp_commitment');
+      if (!saved) {
+        document.getElementById('noDataView').style.display = 'block';
+        return;
+      }
+
+      document.getElementById('mainView').style.display = 'block';
+
+      const { key, date, label } = JSON.parse(saved);
+      const start = new Date(date);
+      const days = Math.max(1, Math.floor((new Date() - start) / (1000*60*60*24)) + 1);
+
+      document.getElementById('dayCountText').textContent = days;
+      document.getElementById('dayCountLabel').textContent = `day${days !== 1 ? 's' : ''} since your commitment`;
+      document.getElementById('recallIcon').textContent = COMMIT_ICONS[key] || '🌱';
+      document.getElementById('recallAction').textContent = label || 'Your commitment';
+    });
+
+    function submitCheckin(answer) {
+      const saved = localStorage.getItem('gp_commitment');
+      if (!saved) return;
+      const { key } = JSON.parse(saved);
+
+      const res = RESULT_DATA[answer];
+      const baseSaving = COMMIT_SAVINGS[key] || 2;
+      const actualSaving = (baseSaving * res.multiplier).toFixed(1);
+
+      document.getElementById('questionPanel').style.display = 'none';
+      const resultPanel = document.getElementById('resultPanel');
+      resultPanel.style.display = 'block';
+      resultPanel.style.animation = 'fadeUp 0.4s ease both';
+
+      document.getElementById('resultEmoji').textContent = res.emoji;
+      document.getElementById('resultTitle').textContent = res.title;
+      document.getElementById('resultSub').textContent = res.sub;
+
+      if (res.multiplier > 0) {
+        document.getElementById('savedStat').style.display = 'inline-flex';
+        document.getElementById('savedNum').textContent = `${actualSaving}kg`;
+      }
+
+      // Award badges
+      const badges = computeBadges(answer, key);
+      if (badges.length > 0) {
+        document.getElementById('badgesEarned').style.display = 'block';
+        document.getElementById('badgeDisplay').innerHTML = badges.map(b =>
+          `<div class="badge-pill unlocked">${b.icon} ${b.name}</div>`
+        ).join('');
+        saveBadges(badges);
+      }
+
+      // Store checkin
+      localStorage.setItem('gp_last_checkin', JSON.stringify({ answer, date: new Date().toISOString(), saving: actualSaving }));
+    }
+
+    function computeBadges(answer, commitKey) {
+      const existing = JSON.parse(localStorage.getItem('gp_badges') || '[]');
+      const toAward = [];
+
+      const allBadges = [
+        { id: 'first_step', icon: '🌱', name: 'First Step', condition: () => true },
+        { id: 'follow_through', icon: '✅', name: 'Follow Through', condition: () => answer === 'yes' || answer === 'exceeded' },
+        { id: 'overachiever', icon: '🚀', name: 'Overachiever', condition: () => answer === 'exceeded' },
+        { id: 'food_hero', icon: '🥦', name: 'Food Hero', condition: () => commitKey === 'meatfree' && (answer === 'yes' || answer === 'exceeded') },
+        { id: 'transit_rider', icon: '🚌', name: 'Transit Rider', condition: () => commitKey === 'transit' && (answer === 'yes' || answer === 'exceeded') },
+        { id: 'community_giver', icon: '🍎', name: 'Community Giver', condition: () => commitKey === 'foodbank' },
+      ];
+
+      allBadges.forEach(badge => {
+        if (!existing.includes(badge.id) && badge.condition()) {
+          toAward.push(badge);
+        }
+      });
+
+      return toAward;
+    }
+
+    function saveBadges(newBadges) {
+      const existing = JSON.parse(localStorage.getItem('gp_badges') || '[]');
+      const updated = [...new Set([...existing, ...newBadges.map(b => b.id)])];
+      localStorage.setItem('gp_badges', JSON.stringify(updated));
+    }
+  </script>
+</body>
+</html>

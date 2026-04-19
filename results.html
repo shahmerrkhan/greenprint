@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GreenPrint — Your Results</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/results.css" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body class="results-page">
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <circle cx="14" cy="14" r="13" stroke="var(--green)" stroke-width="1.5"/>
+            <path d="M8 18c2-4 4-6 6-6s4 2 6-2" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M14 8v4M14 8l-2 2M14 8l2 2" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        GreenPrint
+      </a>
+      <div style="display:flex;gap:10px;align-items:center">
+        <button class="nav-cta" onclick="window.location.href='share.html'" style="cursor:pointer">📤 Share</button>
+        <a href="calculator.html" class="nav-cta">Recalculate</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="results-layout">
+
+    <!-- Score Hero -->
+    <section class="score-hero">
+      <div class="score-hero-inner">
+        <div class="score-left">
+          <div class="results-badge">Your carbon footprint</div>
+          <div class="score-display">
+            <div class="score-ring-large">
+              <svg viewBox="0 0 180 180" width="180" height="180">
+                <circle cx="90" cy="90" r="76" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="14"/>
+                <circle cx="90" cy="90" r="76" fill="none" id="scoreRing"
+                  stroke="var(--green)" stroke-width="14"
+                  stroke-dasharray="477"
+                  stroke-dashoffset="477"
+                  stroke-linecap="round"
+                  transform="rotate(-90 90 90)"/>
+              </svg>
+              <div class="ring-center-lg">
+                <span class="score-main-num" id="totalScore">—</span>
+                <span class="score-unit">t CO₂e/yr</span>
+              </div>
+            </div>
+            <div class="score-context">
+              <div class="context-row" id="vsAverage">
+                <span class="context-label">vs. national average</span>
+                <span class="context-val" id="vsAverageVal">—</span>
+              </div>
+              <div class="context-row">
+                <span class="context-label">Global target by 2030</span>
+                <span class="context-val target">2.5t</span>
+              </div>
+              <div class="score-grade" id="scoreGrade">
+                <span class="grade-label">Rating</span>
+                <span class="grade-val" id="gradeVal">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="score-right">
+          <h2 class="breakdown-heading">Footprint breakdown</h2>
+          <div class="breakdown-list" id="breakdownList">
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Comparison bars -->
+          <div class="comparison-bars">
+            <div class="cmp-heading">How you compare</div>
+            <div class="cmp-bar-row">
+              <span class="cmp-bar-label">You</span>
+              <div class="cmp-bar-track"><div class="cmp-bar-fill you" id="cmpBarYou"></div></div>
+              <span class="cmp-bar-val" id="cmpValYou">—</span>
+            </div>
+            <div class="cmp-bar-row">
+              <span class="cmp-bar-label" id="cmpCountryLabel">Canada avg</span>
+              <div class="cmp-bar-track"><div class="cmp-bar-fill country" id="cmpBarCountry"></div></div>
+              <span class="cmp-bar-val" id="cmpValCountry">—</span>
+            </div>
+            <div class="cmp-bar-row">
+              <span class="cmp-bar-label">2030 target</span>
+              <div class="cmp-bar-track"><div class="cmp-bar-fill" style="width:12.5%;background:var(--teal);border-radius:4px;height:100%;transition:width 1s 0.8s ease"></div></div>
+              <span class="cmp-bar-val" style="color:var(--teal)">2.5t</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Neighbourhood impact counter -->
+    <div class="neighbourhood-bar">
+      <div class="neighbourhood-inner">
+        <div class="nbr-stat">
+          <span class="nbr-num" id="nbrUsers">—</span>
+          <span class="nbr-label">people have calculated their footprint</span>
+        </div>
+        <div class="nbr-divider"></div>
+        <div class="nbr-stat">
+          <span class="nbr-num" id="nbrSavings">—</span>
+          <span class="nbr-label">tonnes combined savings potential</span>
+        </div>
+        <div class="nbr-divider"></div>
+        <div class="nbr-stat">
+          <span class="nbr-num" id="nbrCommitted">—</span>
+          <span class="nbr-label">commitments made this week</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="results-tabs">
+      <div class="tabs-inner">
+        <button class="tab-btn active" data-tab="plan">Action Plan</button>
+        <button class="tab-btn" data-tab="map">Local Resources</button>
+        <button class="tab-btn" data-tab="insights">Insights</button>
+        <button class="tab-btn" data-tab="whatif">What If? 🔮</button>
+      </div>
+    </div>
+
+    <!-- Tab content -->
+    <div class="tab-content">
+
+      <!-- ACTION PLAN TAB -->
+      <div class="tab-panel active" id="tab-plan">
+        <div class="plan-header">
+          <div>
+            <h2 class="panel-title">Your personalized action plan</h2>
+            <p class="panel-desc">Based on your biggest impact areas, here's exactly what you can do — in order of impact.</p>
+          </div>
+          <div class="ai-badge">
+            <span>✨</span> AI-generated
+          </div>
+        </div>
+
+        <div id="aiPlanContainer" class="ai-plan-container">
+          <div class="ai-loading" id="aiLoading">
+            <div class="loading-spinner"></div>
+            <span>Generating your personalized plan...</span>
+          </div>
+          <div id="aiPlanContent" class="ai-plan-content" style="display:none"></div>
+        </div>
+
+        <div class="quick-actions" id="quickActions">
+          <!-- Quick action cards, populated by JS -->
+        </div>
+
+        <!-- COMMITMENT TRACKER -->
+        <div class="commitment-section">
+          <div class="commitment-header">
+            <div>
+              <h2 class="panel-title" style="font-size:22px;margin-bottom:6px">Make a commitment</h2>
+              <p class="panel-desc" style="font-size:14px">Pick one thing you'll actually do this week.</p>
+            </div>
+            <div class="commitment-streak" id="commitmentStreak" style="display:none">
+              <span class="streak-fire">🔥</span>
+              <span class="streak-num" id="streakNum">0</span>
+              <span class="streak-label">day streak</span>
+            </div>
+          </div>
+          <div class="commitment-options" id="commitmentOptions">
+            <button class="commit-btn" data-commit="meatfree" data-label="Go meat-free one day this week" data-saving="saves ~3kg CO₂">🥦 Go meat-free one day this week</button>
+            <button class="commit-btn" data-commit="transit" data-label="Take transit instead of driving tomorrow" data-saving="saves ~2kg CO₂">🚌 Take transit instead of driving tomorrow</button>
+            <button class="commit-btn" data-commit="foodbank" data-label="Donate to a local food bank this week" data-saving="reduces food waste impact">🍎 Donate to a local food bank this week</button>
+            <button class="commit-btn" data-commit="waste" data-label="Sort recycling properly this week" data-saving="reduces landfill methane">♻️ Sort my recycling properly this week</button>
+            <button class="commit-btn" data-commit="thermostat" data-label="Lower thermostat by 2°C tonight" data-saving="saves ~1.5kg CO₂">🌡️ Lower my thermostat 2°C tonight</button>
+            <button class="commit-btn" data-commit="localfood" data-label="Buy local produce next grocery run" data-saving="cuts transport emissions">🛒 Buy local produce next grocery run</button>
+          </div>
+          <div class="commitment-confirmed" id="commitmentConfirmed" style="display:none">
+            <div class="commit-badge">
+              <span class="commit-badge-icon">✅</span>
+              <div class="commit-badge-text">
+                <div class="commit-badge-title" id="commitBadgeTitle">Committed!</div>
+                <div class="commit-badge-sub" id="commitBadgeSub"></div>
+              </div>
+              <button class="commit-change" onclick="resetCommitment()">Change</button>
+            </div>
+            <div class="commit-share">
+              <button class="btn-ghost" style="font-size:13px;padding:10px 18px" onclick="copyShareText()">
+                📋 Copy my results summary
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BADGES PANEL -->
+      <div class="badges-panel" id="badgesPanel">
+        <div class="badges-panel-header">
+          <div>
+            <h3 class="badges-title">Your badges</h3>
+            <p class="badges-sub">Earned through actions and check-ins.</p>
+          </div>
+          <a href="checkin.html" class="checkin-cta-btn" id="checkinCta" style="display:none">
+            🔥 7-Day Check-In →
+          </a>
+        </div>
+        <div class="all-badges" id="allBadges">
+          <!-- populated by JS -->
+        </div>
+      </div>
+
+      <!-- MAP TAB -->
+      <div class="tab-panel" id="tab-map">
+        <div class="map-header">
+          <div>
+            <h2 class="panel-title">Resources near you</h2>
+            <p class="panel-desc">Food banks, community fridges, recycling depots, and green initiatives in your area.</p>
+          </div>
+          <div class="map-filters" id="mapFilters">
+            <button class="filter-btn active" data-type="all">All</button>
+            <button class="filter-btn" data-type="food">🍎 Food</button>
+            <button class="filter-btn" data-type="recycling">♻️ Recycling</button>
+            <button class="filter-btn" data-type="green">🌿 Green Orgs</button>
+          </div>
+        </div>
+        <div id="map" class="map-container"></div>
+        <div class="map-legend">
+          <div class="legend-item"><span class="legend-dot" style="background:#4ade80"></span> Food Resources</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#2dd4bf"></span> Recycling</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#fbbf24"></span> Green Orgs</div>
+        </div>
+        <div class="resource-list" id="resourceList">
+          <!-- Populated by map.js -->
+        </div>
+      </div>
+
+      <!-- DATA SOURCES ACCORDION (inside plan tab, before insights) -->
+
+      <!-- INSIGHTS TAB -->
+      <div class="tab-panel" id="tab-insights">
+        <h2 class="panel-title">Understanding your footprint</h2>
+        <div class="insights-grid" id="insightsGrid">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Data sources accordion -->
+        <div class="sources-section">
+          <button class="sources-toggle" id="sourcesToggle" onclick="toggleSources()">
+            <span>📚 How did we calculate this?</span>
+            <span class="sources-arrow" id="sourcesArrow">↓</span>
+          </button>
+          <div class="sources-content" id="sourcesContent" style="display:none">
+            <div class="sources-grid">
+              <div class="source-item">
+                <div class="source-cat">🍽️ Food emissions</div>
+                <p>Based on lifecycle assessment data from the Oxford University "Reducing food's environmental impacts" study (Poore & Nemecek, 2018). Emission factors per kg of food, averaged across production methods.</p>
+              </div>
+              <div class="source-item">
+                <div class="source-cat">🚗 Transport</div>
+                <p>Vehicle emission factors from Environment and Climate Change Canada (ECCC) national inventory data. EV grid-average emissions based on provincial grid intensity from the Canada Energy Regulator.</p>
+              </div>
+              <div class="source-item">
+                <div class="source-cat">✈️ Aviation</div>
+                <p>Flight emission factors from the UK Department for Energy Security and Net Zero (DESNZ) 2023 conversion factors, including radiative forcing multiplier for high-altitude emissions.</p>
+              </div>
+              <div class="source-item">
+                <div class="source-cat">🏠 Home energy</div>
+                <p>Heating and electricity emission factors from ECCC National Inventory Report. Home size baselines from Statistics Canada housing data (2021 Census).</p>
+              </div>
+              <div class="source-item">
+                <div class="source-cat">🌍 Country averages</div>
+                <p>Per-capita national averages from Our World in Data, sourced from the Global Carbon Project and IEA. Canada average: 15.4t CO₂e/yr per capita (2022).</p>
+              </div>
+              <div class="source-item">
+                <div class="source-cat">📍 Local resources</div>
+                <p>Resource locations pulled live from OpenStreetMap via the Overpass API. Data is community-maintained and may not be fully complete for all areas.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WHAT IF TAB -->
+      <div class="tab-panel" id="tab-whatif">
+        <div class="whatif-header">
+          <div>
+            <h2 class="panel-title">What if you changed one thing?</h2>
+            <p class="panel-desc">Slide the toggles and watch your score update in real time.</p>
+          </div>
+          <div class="whatif-score-display">
+            <span class="whatif-label">Projected footprint</span>
+            <span class="whatif-total" id="whatifTotal">—</span>
+            <span class="whatif-unit">t CO₂e/yr</span>
+            <span class="whatif-delta" id="whatifDelta"></span>
+          </div>
+        </div>
+
+        <div class="whatif-grid">
+          <div class="whatif-card">
+            <div class="whatif-card-header">
+              <span class="whatif-icon">🍽️</span>
+              <div>
+                <div class="whatif-card-title">Shift your diet</div>
+                <div class="whatif-card-current" id="wf-diet-current"></div>
+              </div>
+            </div>
+            <div class="whatif-options" id="wf-diet">
+              <button class="wf-opt" data-field="diet" data-value="beef_heavy">Beef-heavy</button>
+              <button class="wf-opt" data-field="diet" data-value="omnivore_high">Regular meat</button>
+              <button class="wf-opt" data-field="diet" data-value="omnivore_low">Less meat</button>
+              <button class="wf-opt" data-field="diet" data-value="pescatarian">Pescatarian</button>
+              <button class="wf-opt" data-field="diet" data-value="vegetarian">Vegetarian</button>
+              <button class="wf-opt" data-field="diet" data-value="vegan">Vegan</button>
+            </div>
+          </div>
+
+          <div class="whatif-card">
+            <div class="whatif-card-header">
+              <span class="whatif-icon">🚗</span>
+              <div>
+                <div class="whatif-card-title">Change how you travel</div>
+                <div class="whatif-card-current" id="wf-transport-current"></div>
+              </div>
+            </div>
+            <div class="whatif-options" id="wf-transport">
+              <button class="wf-opt" data-field="transport" data-value="gas_car_large">SUV/Truck</button>
+              <button class="wf-opt" data-field="transport" data-value="gas_car_small">Gas car</button>
+              <button class="wf-opt" data-field="transport" data-value="electric_car">EV</button>
+              <button class="wf-opt" data-field="transport" data-value="public_transit">Transit</button>
+              <button class="wf-opt" data-field="transport" data-value="walk_cycle">Walk/Cycle</button>
+            </div>
+          </div>
+
+          <div class="whatif-card">
+            <div class="whatif-card-header">
+              <span class="whatif-icon">✈️</span>
+              <div>
+                <div class="whatif-card-title">Reduce flights</div>
+                <div class="whatif-card-current" id="wf-flights-current"></div>
+              </div>
+            </div>
+            <div class="whatif-slider">
+              <input type="range" class="form-range" id="wf-flights-range" min="0" max="20" step="1" />
+              <div class="range-labels">
+                <span>0 flights</span>
+                <span id="wf-flights-val" class="range-val">—</span>
+                <span>20 flights</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="whatif-card">
+            <div class="whatif-card-header">
+              <span class="whatif-icon">🏠</span>
+              <div>
+                <div class="whatif-card-title">Switch heating source</div>
+                <div class="whatif-card-current" id="wf-heating-current"></div>
+              </div>
+            </div>
+            <div class="whatif-options" id="wf-heating">
+              <button class="wf-opt" data-field="heating" data-value="oil">Oil/Propane</button>
+              <button class="wf-opt" data-field="heating" data-value="natural_gas">Natural Gas</button>
+              <button class="wf-opt" data-field="heating" data-value="electric_renewable">Electric/Renewable</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="whatif-impact-bar">
+          <div class="wf-bar-labels">
+            <span>Your current score</span>
+            <span id="wf-current-label"></span>
+          </div>
+          <div class="wf-bars">
+            <div class="wf-bar-row">
+              <span class="wf-bar-name">Current</span>
+              <div class="wf-bar-track"><div class="wf-bar-fill current" id="wf-bar-current"></div></div>
+              <span class="wf-bar-score" id="wf-bar-current-val"></span>
+            </div>
+            <div class="wf-bar-row">
+              <span class="wf-bar-name">Projected</span>
+              <div class="wf-bar-track"><div class="wf-bar-fill projected" id="wf-bar-projected"></div></div>
+              <span class="wf-bar-score" id="wf-bar-projected-val"></span>
+            </div>
+            <div class="wf-bar-row">
+              <span class="wf-bar-name">2030 target</span>
+              <div class="wf-bar-track"><div class="wf-bar-fill target" style="width:12.5%;background:var(--teal)"></div></div>
+              <span class="wf-bar-score" style="color:var(--teal)">2.5t</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Calculation loading overlay (shown briefly when coming from calculator) -->
+  <div id="calcOverlay" class="calc-overlay">
+    <div class="calc-overlay-inner">
+      <div class="calc-overlay-ring">
+        <svg viewBox="0 0 80 80" width="80" height="80">
+          <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(74,222,128,0.1)" stroke-width="6"/>
+          <circle cx="40" cy="40" r="32" fill="none" stroke="var(--green)" stroke-width="6"
+            stroke-dasharray="201" stroke-dashoffset="201"
+            stroke-linecap="round" transform="rotate(-90 40 40)"
+            id="overlayRingFill"/>
+        </svg>
+      </div>
+      <div class="calc-overlay-title">Calculating your footprint</div>
+      <div class="calc-overlay-steps">
+        <div class="overlay-step active" id="ovStep1">🍽️ Analysing food emissions...</div>
+        <div class="overlay-step" id="ovStep2">🚗 Calculating transport impact...</div>
+        <div class="overlay-step" id="ovStep3">🏠 Measuring home energy use...</div>
+        <div class="overlay-step" id="ovStep4">📍 Finding local resources...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No data fallback -->
+  <div id="noDataModal" class="modal" style="display:none">
+    <div class="modal-card">
+      <span class="modal-icon">📊</span>
+      <h3>No footprint data found</h3>
+      <p>Looks like you came here directly. Please complete the calculator first.</p>
+      <a href="calculator.html" class="btn-primary">Go to Calculator →</a>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/results.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/ai-plan.js"></script>
+</body>
+</html>
